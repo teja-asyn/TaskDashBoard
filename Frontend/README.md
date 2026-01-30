@@ -78,11 +78,9 @@ Frontend/
 2. **Dashboard** - Project overview
    - List all projects
    - Task counts by status
-   - Quick actions
    - Activity feed
 
 3. **Project View** - Kanban board
-   - Drag-and-drop task management
    - Task filtering (status, priority, assignee)
    - Search functionality
    - Board and list view modes
