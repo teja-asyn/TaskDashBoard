@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-100 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400;
+  }
+}
+
+@layer components {
+  /* Form styles */
+  .input-field {
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-lg 
+           focus:ring-2 focus:ring-primary-500 focus:border-transparent 
+           outline-none transition-all duration-200
+           placeholder:text-gray-400;
+  }
+
+  .input-error {
+    @apply border-danger-500 focus:ring-danger-500;
+  }
+
+  .btn {
+    @apply px-6 py-2.5 rounded-lg font-medium transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-offset-2 
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-primary-600 text-white hover:bg-primary-700 
+           focus:ring-primary-500 active:bg-primary-700;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-800 hover:bg-gray-300 
+           focus:ring-gray-400 active:bg-gray-400;
+  }
+
+  .btn-danger {
+    @apply bg-danger-500 text-white hover:bg-danger-600 
+           focus:ring-danger-500 active:bg-danger-700;
+  }
+
+  .btn-outline {
+    @apply border border-gray-300 text-gray-700 hover:bg-gray-50 
+           focus:ring-gray-400;
+  }
+
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-card border border-gray-200 
+           transition-all duration-200 hover:shadow-card-hover;
+  }
+
+  /* Badge styles */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-success-50 text-success-700;
+  }
+
+  .badge-warning {
+    @apply bg-warning-50 text-warning-700;
+  }
+
+  .badge-danger {
+    @apply bg-danger-50 text-danger-700;
+  }
+
+  .badge-info {
+    @apply bg-primary-50 text-primary-700;
+  }
+
+  /* Status badges */
+  .status-badge-todo {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  .status-badge-in-progress {
+    @apply bg-primary-100 text-primary-800;
+  }
+
+  .status-badge-done {
+    @apply bg-success-100 text-success-700;
+  }
+
+  /* Priority badges */
+  .priority-badge-low {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  .priority-badge-medium {
+    @apply bg-warning-100 text-warning-700;
+  }
+
+  .priority-badge-high {
+    @apply bg-danger-100 text-danger-700;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary-600;
+  }
+
+  /* Page container */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+  }
+
+  /* Section header */
+  .section-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-gray-900;
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm z-50 
+           flex items-center justify-center p-4;
+  }
+
+  /* Task card */
+  .task-card {
+    @apply card p-4 mb-3 cursor-pointer hover:shadow-md 
+           transition-all duration-200;
+  }
+    /* Drag and drop styles */
+  .drag-preview {
+    @apply bg-white shadow-lg rounded-lg border-2 border-primary-300;
+  }
+
+  .drag-over {
+    @apply bg-primary-50 border-primary-300;
+  }
+
+  /* Smooth column transitions */
+  .kanban-column {
+    @apply transition-all duration-200;
+  }
+
+  .kanban-column-drag-over {
+    @apply transform scale-[1.02];
+  }
+
+  /* Task card hover effects */
+  .task-card-hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+
+  /* Custom scrollbar for columns */
+  .kanban-scroll {
+    @apply scrollbar-hide;
+  }
+
+  /* Empty column state */
+  .empty-column {
+    @apply border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors;
+  }
+}
+
+/* Smooth drag animations */
+[data-rbd-draggable-context-id] {
+  transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-rbd-drag-handle-context-id] {
+  cursor: grab;
+}
+
+[data-rbd-drag-handle-context-id]:active {
+  cursor: grabbing;
+}
+
+@layer utilities {
+  /* Screen reader only - visually hidden but accessible to screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Focus visible - only show focus ring on keyboard navigation */
+  .focus-visible:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Line clamp for multi-line text truncation */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  /* Smooth transitions */
+  .transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Modal Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Form Validation Styles */
+.form-error {
+  @apply mt-1 text-sm text-danger-600;
+}
+
+.form-hint {
+  @apply mt-1 text-sm text-gray-500;
+}
+
+/* Custom Scrollbar for Modal */
+.modal-content {
+  @apply max-h-[90vh] overflow-y-auto scrollbar-hide;
+}
+
+/* Button variants */
+.btn-warning {
+  @apply bg-warning-600 text-white hover:bg-warning-700 
+         focus:ring-warning-500 active:bg-warning-700;
+}
+
+.btn-success {
+  @apply bg-success-500 text-white hover:bg-success-600 
+         focus:ring-success-500 active:bg-success-700;
+}
