@@ -73,7 +73,7 @@ const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
     const allowedOrigins = process.env.CORS_ORIGIN 
       ? process.env.CORS_ORIGIN.split(',')
-      : (process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5173', 'http://localhost:3000']);
+      : (process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5173', 'http://localhost:3000','https://taskdashboard-kappa.vercel.app/']);
     
     // Allow requests with no origin (like mobile apps or curl requests) in development
     if (process.env.NODE_ENV !== 'production' && !origin) {
