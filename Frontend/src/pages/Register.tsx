@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { FiUser, FiMail, FiLock, FiEye, FiEyeOff, FiCheck, FiX } from 'react-icons/fi';
@@ -6,6 +6,9 @@ import { register, clearError } from '../store/slices/authSlice';
 import { apiSlice } from '../store/api/apiSlice';
 import type { RootState, AuthState, AppDispatch } from '../store/store';
 import { Toaster, toast } from 'react-hot-toast';
+import LoginLoader from '../components/common/LoginLoader';
+
+type LoadingStage = 'connecting' | 'authenticating' | 'loading' | null;
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -18,6 +21,9 @@ const Register: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPasswordRequirements, setShowPasswordRequirements] = useState(false);
+  const [loadingStage, setLoadingStage] = useState<LoadingStage>(null);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const startTimeRef = useRef<number | null>(null);
 
   // Password requirements validation
   const passwordRequirements = useMemo(() => {
@@ -43,6 +49,8 @@ const Register: React.FC = () => {
     if (error) {
       toast.error(error);
       dispatch(clearError());
+      setLoadingStage(null);
+      setLoadingMessage('');
     }
   }, [error, dispatch]);
 
@@ -51,6 +59,14 @@ const Register: React.FC = () => {
       navigate('/dashboard');
     }
   }, [token, navigate]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      setLoadingStage(null);
+      setLoadingMessage('');
+    };
+  }, []);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -110,16 +126,58 @@ const Register: React.FC = () => {
 
     // Clear any stale cache before registering to prevent data leakage
     dispatch(apiSlice.util.resetApiState());
-
-    const result = await dispatch(register({
-      name: formData.name,
-      email: formData.email,
-      password: formData.password,
-    }));
     
-    if (register.fulfilled.match(result)) {
-      toast.success('Registration successful!');
-      navigate('/dashboard');
+    // Start loading stages
+    startTimeRef.current = Date.now();
+    setLoadingStage('connecting');
+    setLoadingMessage('Connecting to server...');
+    
+    // Progressive stage updates for Render cold start
+    const stageTimer = setTimeout(() => {
+      if (loadingStage === 'connecting') {
+        setLoadingMessage('Server is waking up, please wait...');
+      }
+    }, 3000);
+    
+    const stageTimer2 = setTimeout(() => {
+      if (loadingStage === 'connecting') {
+        setLoadingMessage('Almost there, establishing secure connection...');
+      }
+    }, 8000);
+    
+    try {
+      // Simulate connection phase
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setLoadingStage('authenticating');
+      setLoadingMessage('Creating your account...');
+      
+      const result = await dispatch(register({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }));
+      
+      clearTimeout(stageTimer);
+      clearTimeout(stageTimer2);
+      
+      if (register.fulfilled.match(result)) {
+        setLoadingStage('loading');
+        setLoadingMessage('Setting up your workspace...');
+        
+        // Small delay to show success state
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        toast.success('Registration successful!');
+        navigate('/dashboard');
+      } else {
+        setLoadingStage(null);
+        setLoadingMessage('');
+      }
+    } catch (err) {
+      clearTimeout(stageTimer);
+      clearTimeout(stageTimer2);
+      setLoadingStage(null);
+      setLoadingMessage('');
     }
   };
 
@@ -387,19 +445,43 @@ const Register: React.FC = () => {
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || loadingStage !== null}
                 className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2.5 sm:py-3 px-4 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed mt-4 sm:mt-6 text-sm sm:text-base"
               >
-                {isLoading ? (
+                {isLoading || loadingStage !== null ? (
                   <div className="flex items-center justify-center">
                     <div className="spinner w-4 h-4 sm:w-5 sm:h-5 border-2 border-white border-t-transparent rounded-full"></div>
-                    <span className="ml-2">Creating account...</span>
+                    <span className="ml-2">
+                      {loadingStage === 'connecting' ? 'Connecting...' :
+                       loadingStage === 'authenticating' ? 'Creating account...' :
+                       loadingStage === 'loading' ? 'Setting up...' :
+                       'Creating account...'}
+                    </span>
                   </div>
                 ) : (
                   'Create Account'
                 )}
               </button>
             </form>
+
+            {/* Creative Loading Overlay */}
+            {loadingStage && (
+              <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+                  <LoginLoader 
+                    stage={loadingStage} 
+                    message={loadingMessage}
+                  />
+                  {loadingStage === 'connecting' && startTimeRef.current && Date.now() - startTimeRef.current > 5000 && (
+                    <div className="mt-4 text-center">
+                      <p className="text-xs text-gray-500">
+                        ⏱️ Free tier servers may take 30-60 seconds to wake up
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Sign In Link */}
             <p className="text-center text-xs sm:text-sm text-gray-600 mt-2">
